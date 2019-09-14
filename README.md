@@ -7,4 +7,5 @@ Generate a one year Bible reading plan that:
 
 ## Instructions
 `bundle install`
+
 `ruby main.rb`
