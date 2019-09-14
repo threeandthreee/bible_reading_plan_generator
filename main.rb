@@ -1,9 +1,6 @@
 require 'nokogiri'
-require_relative 'book'
-require_relative 'chapter'
 require_relative 'day_of_reading'
-require_relative 'testament'
-require_relative 'testament_feeder'
+require_relative 'feeder'
 
 OT_BOOK_COUNT = 39
 NT_BOOK_COUNT = 27
@@ -15,45 +12,63 @@ file = File.open('KJV.xml')
 bible = Nokogiri::XML(file)
 
 
-# Set up
-ot, nt = bible.root.css('BIBLEBOOK').partition{ |book| book['bnumber'] <= OT_BOOK_COUNT}.map do |books|
-  Testament.new books.map do |book|
-    Book.new book['bsname'], book.css('CHAPTER').map do |chapter|
-      Chapter.new chapter['cnumber'], chapter.css('VERS').map do |verse|
-        verse.text
+# Set up feeder
+feeders = bible.root.css('BIBLEBOOK')
+  .partition{ |book| book['bnumber'].to_i <= OT_BOOK_COUNT}
+  .map do |books|
+    Feeder.new(books.map do |book|
+      chapters = book.css('CHAPTER').map do |chapter|
+        length = chapter.css('VERS').sum{ |verse| verse.text.length }
+        {number: chapter['cnumber'], length: length}
       end
-    end
-  end
+      {name: book['bsname'], number: book['bnumber'], chapters: chapters}
+    end)
 end
 
 
 # Build plan
-TOTAL_LENGTH = ot.length + nt.length
+TOTAL_LENGTH = feeders.sum{ |feeder| feeder.original_length }
 DAILY_QUOTA = TOTAL_LENGTH.to_f / DAYS
 
-feeders = [TestamentFeeder.new(ot), TestamentFeeder.new(nt)]
-reading_plan = Array.new(DAYS){ |day| DayOfReading.new(day + 1) }
+allocated = 0
+reading_plan = Array.new(DAYS) do |day|
+  # Setup
+  todays_quota = DAILY_QUOTA * (day + 1) - allocated
+  today = DayOfReading.new(day, todays_quota)
+  feeders.each{ |feeder| feeder.clear }
 
-(1..DAYS).each do |day|
-  target = day * DAILY_QUOTA - (otr.allocated + ntr.allocated)
-  current = 0
-
-  feeders.sort_by!{ |tr| tr.percent_allocated } # favor testament that is behind
-
-  # alternate until we go over, stop and try from other channel until we go over, select best capstone or none
+  # Add chapter from least read feed, unconditionally
+  #today << feeders.max_by{ |feeder| feeder.remaining }.shift
+  today << feeders.first.shift
+  
   until feeders.all?{ |feeder| feeder.is_halted? } do
-    feeders.reject{ |feeder| feeder.is_halted? }.each{ |feeder| do
-      if feeder.peek.length + current <= target do
-        reading_plan << feeder.pop
-      else
-        feeder.halt
-      end
+    feeder = feeders
+      .reject{ |feeder| feeder.is_halted? }
+      .max_by{ |feeder| feeder.remaining }
+    if today.can_fit? feeder.first
+      today << feeder.shift
+    else
+      feeder.halt
     end
   end
   
-  # Select best capstone provider (or none)
-  best_capstone_provider = (feeder + TestamentFeeder.none).min_by{ |feeder| do
-    (feeder.peek.length + current - target).abs
+  # Select best capstone, only use if it gets us closer to quota
+  best_capstone_feeder = feeders
+    .reject{ |feeder| feeder.is_blocked? }
+    .min_by{ |feeder| today.projected_distance_from_quota_with feeder.first }
+  if(best_capstone_feeder and today.improved_by? best_capstone_feeder.first)
+    best_capstone_feeder.clear
+    today << best_capstone_feeder.shift
   end
-  reading_plan << best_capstone_provider.pop if best_capstone_provider.exists?
+  
+  # Cleanup
+  allocated += today.allocated
+  
+  today
+end
+
+
+# Output
+File.open('Plan.txt', 'w') do |f|
+  reading_plan.each{ |plan_day| f.puts plan_day }
 end
