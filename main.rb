@@ -35,30 +35,17 @@ reading_plan = Array.new(DAYS) do |day|
   # Setup
   todays_quota = DAILY_QUOTA * (day + 1) - allocated
   today = DayOfReading.new(day, todays_quota)
-  feeders.each{ |feeder| feeder.clear }
 
-  # Add chapter from least read feed, unconditionally
-  #today << feeders.max_by{ |feeder| feeder.remaining }.shift
+  # Add chapter from old testament, unconditionally
   today << feeders.first.shift
-  
-  until feeders.all?{ |feeder| feeder.is_halted? } do
+
+  # Add from feeders part by part
+  until feeders.reject{ |feeder| feeder.done? }.none?{ |feeder| today.improved_by? feeder.first } do
     feeder = feeders
-      .reject{ |feeder| feeder.is_halted? }
+      .reject{ |feeder| feeder.done? }
+      .select{ |feeder| today.improved_by? feeder.first }
       .max_by{ |feeder| feeder.remaining }
-    if today.can_fit? feeder.first
-      today << feeder.shift
-    else
-      feeder.halt
-    end
-  end
-  
-  # Select best capstone, only use if it gets us closer to quota
-  best_capstone_feeder = feeders
-    .reject{ |feeder| feeder.is_blocked? }
-    .min_by{ |feeder| today.projected_distance_from_quota_with feeder.first }
-  if(best_capstone_feeder and today.improved_by? best_capstone_feeder.first)
-    best_capstone_feeder.clear
-    today << best_capstone_feeder.shift
+    today << feeder.shift
   end
   
   # Cleanup

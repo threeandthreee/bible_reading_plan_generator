@@ -32,16 +32,15 @@ class DayOfReading
   def to_s
     date = @date.strftime('%b %e')
     reading = @parts
-      .sort_by{ |part| part[:book_number] }
-      .chunk{ |part| part[:book_number] }
-      .map do |book_number, chunk|
-        book_string = chunk.first[:book_name]
+      .sort_by{ |part| part[:book_number].to_i }
+      .chunk{ |part| part[:book_name] }
+      .map do |book_name, chunk|
         chapter_string = ''+chunk.first[:chapter_number]
         chapter_string << "-#{chunk.last[:chapter_number]}" if chunk.length > 1
-        "#{book_string} #{chapter_string}"
+        "#{book_name} #{chapter_string}"
       end
       .join(', ')
       
-    "#{date}: #{reading} [off by: #{(allocated-11259)}]"
+    "#{date}: #{reading}"
   end
 end

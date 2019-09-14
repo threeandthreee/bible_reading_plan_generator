@@ -9,14 +9,8 @@ class Feeder
   end
   
   def shift
-    return nil if is_halted?
-    is_end_of_book = @books.first[:chapters].length == 1
-    book = if is_end_of_book
-        @blocked = true
-        @books.shift
-      else
-        @books.first
-      end
+    book_end = @books.first[:chapters].length == 1
+    book = book_end ? @books.shift : @books.first
     chapter = book[:chapters].shift
     format_result book, chapter
   end
@@ -36,21 +30,8 @@ class Feeder
     }
   end
   
-  def clear
-    @halted = false
-    @blocked = false unless @books.empty?
-  end
-  
-  def halt
-    @halted = true
-  end
-  
-  def is_halted?
-    @halted || @blocked
-  end
-  
-  def is_blocked?
-    @blocked
+  def done?
+    @books.empty?
   end
   
   def content_length
