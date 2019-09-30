@@ -4,7 +4,6 @@ Generate a bible reading plan based off of a configuration file, attempting to k
 ## Instructions
 `bundle install`
 
-<<<<<<< HEAD
 `ruby generate.rb <blueprint> [<output file>]`
 
 Example: `ruby generate.rb traditional ./traditional_plan.txt`
@@ -23,6 +22,3 @@ Reading streams allow for parallel sets of reading. The traditional reading plan
 A reading stream is a list of books or book ranges. Books can be represented by their number, short name, or full name. The names and numbering are strictly based on what's in the xml bible we parsed, so reference that if you're creating your own blueprint (or just use numbers). For example: `1`, `Gen`, and `Genesis` all resolve to the book of Genesis.
 
 A range of books is represented the same way as a range of months: a two item array or a hash with keys `from` and `to`. For example, the Torah (Genesis through Deuteronomy) can be represented: `[1, 5]`, `{from: Genesis, to: Deuteronomy}`, or listed individually without a range such as: `Gen, Exod, Lev, Num, Deut`.
-=======
-`ruby main.rb`
->>>>>>> dc29e4f87921be2ab51f6db7620a16bee914744c
