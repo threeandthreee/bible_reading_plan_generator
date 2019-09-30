@@ -1,0 +1,18 @@
+[Jan, Feb]:
+  - [Gen, Exod, Lev, Num, Deut]
+[Mar, Apr]:
+  - [Josh, Judg, 1Sam, 2Sam, 1Kgs, 2Kgs, Matt]
+[May, Jun]:
+  - [Isa, Jer, Ezek]
+Jul:
+  - [{from: Hos, to: Mal}, Luke]
+Aug:
+  - [1Chr, 2Chr, Ezra, Neh, Dan]
+Sept:
+  - [Ps, Mark]
+Oct:
+  - [Acts, Prov, Eccl, Job]
+Nov:
+  - [{from: Rom, to: Jude}]
+Dec:
+  - [Ruth, Esth, Song, Lam, John, Rev]
