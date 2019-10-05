@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 gem 'haml'
 gem 'nokogiri'
+gem 'rack'
 gem 'rdiscount'
 gem 'sinatra'
