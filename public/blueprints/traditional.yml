@@ -1,0 +1,8 @@
+# Traditional reading plan that goes
+# through the Old Testament and New
+# Testament in parallel.
+{from: Jan, to: Dec}:
+  # First stream covers Old Testament
+  - - {from: Gen, to: Mal}
+  # Second stream covers New Testament
+  - - {from: Matt, to: Rev}

@@ -1,0 +1,19 @@
+# Variation on traditional blueprint
+# where poetry books are shifted to
+# the New Testament stream to balance
+# things out.
+{from: Jan, to: Dec}:
+  # First stream is Old Testament,
+  # skipping Job through Son of Songs.
+  - - {from: Genesis, to: Esther}
+    - {from: Isaiah, to: Malachi}
+  # Second stream is New Testament
+  # the previously omitted books
+  # placed after the Gospel.
+  - - {from: Matt, to: John}
+    - Psalm
+    - Proverbs
+    - Eccl
+    - Song
+    - Job
+    - {from: Acts, to: Revelation}

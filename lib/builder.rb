@@ -4,16 +4,19 @@ require_relative './blueprint.rb'
 require_relative './day_of_reading.rb'
 
 class Builder
-  def self.build blueprint_file, bible_file
-    blueprint = Blueprint.new blueprint_file
-    bible = Bible.new bible_file
+  def initialize bible_file
+    @bible = Bible.new bible_file
+  end
+
+  def build blueprint_string
+    blueprint = Blueprint.new blueprint_string
     blueprint.map do |date_range, reading_streams|
-      feeders = reading_streams.map{ |stream| bible.get_feeder stream }
+      feeders = reading_streams.map{ |stream| @bible.get_feeder stream }
       self.build_portion date_range, feeders
     end.flatten(1).map{ |day| day.to_s }.join("\n")
   end
 
-  def self.build_portion date_range, feeders
+  def build_portion date_range, feeders
     start, finish = date_range
     days = (finish - start).to_i + 1
     total_length = feeders.sum{ |feeder| feeder.original_length }
@@ -31,7 +34,7 @@ class Builder
     end
   end
 
-  def self.fill_day day_of_reading, feeders
+  def fill_day day_of_reading, feeders
     until feeders.none?{ |feeder| day_of_reading.can_fit? feeder }
       day_of_reading << feeders
         .select{ |feeder| day_of_reading.can_fit? feeder}
@@ -39,7 +42,7 @@ class Builder
     end
   end
 
-  def self.cap_day day_of_reading, feeders
+  def cap_day day_of_reading, feeders
     shortest = feeders
       .reject{ |feeder| feeder.remaining == 0 }
       .min_by{ |feeder| feeder.peek[:length] }

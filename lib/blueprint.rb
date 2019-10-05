@@ -4,8 +4,8 @@ require 'psych'
 class Blueprint
   include Enumerable
 
-  def initialize blueprint_file
-    @data = Psych.load(blueprint_file)
+  def initialize blueprint_string
+    @data = Psych.parse(blueprint_string).to_ruby
       .transform_keys{ |timeframe| parse_timeframe timeframe }
   end
 

@@ -1,0 +1,61 @@
+!!! 5
+%html
+  %head
+    %title Bible Reading Plan Generator
+    %link(rel="stylesheet" href="/css/bootstrap.min.css")
+    %link(rel="stylesheet" href="/css/style.css")
+  %body
+    .container
+      %h1 Bible Reading Plan Generator
+      %hr
+      .row
+        .col-xs-12.col-lg-5.col-xl-6.order-lg-2
+          :markdown
+            #### What is this?
+            This is a tool for building a custom plan to read through the Bible in a year. Define a [YAML](https://yaml.org/) blueprint that assigns books of the Bible to timeframes, and the tool attempts to space out the reading as evenly as possible. The source code is on [GitHub](https://github.com/alnordst/bible_reading_plan_generator) and you're welcome to use generated reading plans however you'd like.
+
+            #### Blueprint guide
+            The top level items are **timeframes**. A timeframe can be a month or a range of months. A month can be represented by the English name, the shortened (3 character) English name, or its number. So `January`, `Jan`, and `1` all refer to the month of January. A range can be represented by an array of two items or as a hash with keys *from* and *to*. So the range from March to September can be represented as `[Mar, Sept]` or `{from: March, to: September}`.
+
+            A timeframe is associated with an array of **streams**. Streams are sets of reading that are scheduled concurrently. For example, the *traditional* plan has two streams: one for the Old Testament and one for the New.
+
+            A stream is an array of books or book ranges. Books can be referenced by their full name, short name, or number. So `Genesis`, `Gen`, and `1` all refer to the book of Genesis. Book ranges are represented the same way month ranges are. Referencing a book by name is a little tricky because I do exact string matching based on the Bible I worked off of, and there's a lot of little variations in names of books of the bible. I used the XML version of the KJV bible provided by [bible4u.net](https://bible4u.net/en/download#en), so you can reference that file to see the exact names used if you'd like, but it's probably simpler to just use the book numbers.
+        .col-xs-12.col-lg-7.col-xl-6
+          %nav
+            %ul.nav.nav-tabs(role="tablist")
+              %li.nav-item
+                %a.nav-link.active#trad-tab(href="#trad" data-toggle="tab" role="tab") Traditional
+              %li.nav-item
+                %a.nav-link#bala-tab(href="#bala" data-toggle="tab" role="tab") Balanced
+              %li.nav-item
+                %a.nav-link#simp-tab(href="#simp" data-toggle="tab" role="tab") Simple
+              %li.nav-item
+                %a.nav-link#opin-tab(href="#opin" data-toggle="tab" role="tab") Opinionated
+              %li.nav-item
+                %a.nav-link#cust-tab(href="#cust" data-toggle="tab" role="tab") Custom
+          .tab-content
+            .tab-pane.active#trad(role="tabpanel")
+              .tab-box
+                #trad-editor.editor(style='width:100%;height:100%;padding:10px') 
+            .tab-pane#bala(role="tabpanel")
+              .tab-box
+                #bala-editor.editor(style='width:100%;height:100%;padding:10px')
+            .tab-pane#simp(role="tabpanel")
+              .tab-box
+                #simp-editor.editor(style='width:100%;height:100%;padding:10px') 
+            .tab-pane#opin(role="tabpanel")
+              .tab-box
+                #opin-editor.editor(style='width:100%;height:100%;padding:10px')
+            .tab-pane#cust(role="tabpanel") 
+              .tab-box
+                #cust-editor.editor(style='width:100%;height:100%;padding:10px') # Build your own!
+          %button.btn.btn-primary.mt-2#gen-btn Generate Reading Plan
+          %button.btn.btn-outline-primary.mt-2#copy-btn Copy Output
+          .output-box
+            %textarea.mt-2
+      %hr.mt-4
+      .small.text-right &copy;2019 Alex Nordstrom
+    %script(src="/js/jquery.min.js")
+    %script(src="/js/bootstrap.min.js")
+    %script(src="/js/ace.js")
+    %script(src="/js/script.js")
